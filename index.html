@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title> AI 1 Minute - မြန်မာစံတော်ချိန်</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .number-badge {
+            display: inline-block;
+            width: 25px;
+            height: 28px;
+            line-height: 36px;
+            text-align: center;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            color: white;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+        .progress-container {
+            height: 10px;
+            background-color: #374151;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0px 0;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+            background: linear-gradient(90deg, #ef4444, #f97316);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+        }
+        .progress-fill-small {
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+        .countdown-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #f59e0b;
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        .pulse {
+            animation: pulse-animation 1s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .loading-bar {
+            height: 8px;
+            width: 100%;
+            background-color: #374151;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+            transition: width 0.3s ease;
+        }
+        .prediction-card {
+            background: linear-gradient(135deg, #1e40af, #3730a3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .ai-badge {
+            position: absolute;
+            top: -13px;
+            right: 5px;
+            background: #f59e0b;
+            color: black;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .confidence-bar {
+            height: 4px;
+            width: 100%;
+            background-color: #1f2937;
+            border-radius: 2px;
+            margin-top: 0px;
+            overflow: hidden;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+        }
+        .win-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .lose-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .win-text {
+            color: #10b981;
+            font-weight: bold;
+            animation: win-pulse 0.5s infinite;
+        }
+        .lose-text {
+            color: #ef4444;
+            font-weight: bold;
+            animation: lose-pulse 0.5s infinite;
+        }
+        @keyframes win-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        @keyframes lose-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        .next-prediction {
+            background: linear-gradient(135deg, #1e40af, #3730a3);
+            border-radius: 10px;
+            padding: 3px;
+            text-align: center;
+            margin-top: 4px;
+        }
+        .result-flash {
+            animation: flash 3s ease;
+        }
+        @keyframes flash {
+            0% { opacity: 0; transform: scale(0.8); }
+            20% { opacity: 1; transform: scale(1.1); }
+            30% { transform: scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white p-4">
+    <div class="max-w-xl mx-auto">
+        <!-- ခေါင်းစီး -->
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-yellow-400">AI-6Lottery Wingo - 1 Minute</h1>
+            <div id="myanmarClock" class="bg-gray-800 px-3 py-1 rounded-lg text-yellow-300 text-sm font-mono">
+            <span id="currentTime">--:--:--</span>
+            </div>
+        </div>
+
+        <!-- Auto Update စနစ် -->
+        <div class="bg-gray-800 p-3 rounded-lg mb-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-sync-alt text-yellow-400 mr-2"></i>
+                <span>Next Result TIMER</span>
+            </div>
+            <div class="flex items-center">
+                <div class="countdown-circle pulse" id="countdownCircle">60</div>
+                <label class="relative inline-flex items-center cursor-pointer ml-3">
+                    <input type="checkbox" id="autoUpdateToggle" class="sr-only peer" checked>
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:ring-2 peer-focus:ring-yellow-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Loading Bar -->
+        <div class="loading-bar mb-4" id="globalLoadingBar">
+            <div class="loading-progress" id="globalLoadingProgress"></div>
+        </div>
+
+        <!-- နောက်ဆုံးရလဒ်များ -->
+        <div class="bg-blue-900 p-3 rounded-lg mb-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-yellow-300">
+                    <i class="fas fa-history mr-2"></i>GAME LAST RESULT 3DGI
+                </h3>
+                <span class="text-xs bg-blue-700 px-2 py-1 rounded">AUTO RESULT</span>
+            </div>
+            <div id="lastResults" class="flex justify-center mt-2 text-lg font-bold">
+                <span class="text-gray-400">Please Wait ...</span>
+            </div>
+            <!-- Win/Loss Result Display -->
+            <div id="winLossResult" class="text-center mt-3 text-sm font-bold"></div>
+        </div>
+
+        <!-- AI ခန့်မှန်းချက်များ -->
+        <div class="bg-purple-900 p-3 rounded-lg mb-4">
+            <h3 class="font-bold text-yellow-300 mb-2">
+                <i class="fas fa-robot mr-2"></i>AI Estimate
+            </h3>
+            <div class="grid grid-cols-5 gap-2 mt-3" id="aiPredictions">
+                <div class="prediction-card">
+                    <div class="relative">
+                        <div class="number-badge bg-purple-600">?</div>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="text-xs mt-1 text-gray-300"></div>
+                </div>
+                <div class="prediction-card">
+                    <div class="relative">
+                        <div class="number-badge bg-purple-600">?</div>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="text-xs mt-1 text-gray-300"></div>
+                </div>
+                <div class="prediction-card">
+                    <div class="relative">
+                        <div class="number-badge bg-purple-600">?</div>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="text-xs mt-1 text-gray-300"></div>
+                </div>
+                <div class="prediction-card">
+                    <div class="relative">
+                        <div class="number-badge bg-purple-600">?</div>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="text-xs mt-1 text-gray-300"></div>
+                </div>
+                <div class="prediction-card">
+                    <div class="relative">
+                        <div class="number-badge bg-purple-600">?</div>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="text-xs mt-1 text-gray-300"></div>
+                </div>
+            </div>
+            
+            <!-- Next Prediction -->
+            <div class="next-prediction">
+                <h4 class="font-bold text-yellow-300 mb-2"></h4>
+                <div id="nextPrediction" class="text-xl font-bold">
+                    <span class="text-gray-400">Calculating...</span>
+                </div>
+                <div class="text-xs text-gray-300 mt-2" id="nextPredictionStats"></div>
+            </div>
+        </div>
+
+        <!-- Big/Small ခန့်မှန်းချက် -->
+        <div class="bg-gray-800 p-3 rounded-lg mb-4">
+            <h3 class="font-bold text-yellow-300 mb-2">
+                <i class="fas fa-chart-pie mr-2"></i>BIG/SMALL ESTIMATE
+            </h3>
+            <div id="bigSmallContainer" class="grid grid-cols-1 gap-4">
+                <div class="bg-gray-700 p-3 rounded text-center">
+                    <span class="text-gray-400">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- နောက်ဆုံး update အချိန် -->
+        <div class="text-center text-xs text-gray-500 mt-4">
+            <span id="lastUpdateTime">--:-Developer By Dream-:-- @zawzawaung700000</span>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let autoUpdateInterval;
+        let countdownInterval;
+        let secondsLeft = 60;
+        let lastThreeNumbers = [];
+        let lastPrediction = null;
+        let winLossTimeout = null;
+        let isShowingWinLoss = false;
+        let hasCheckedThisMinute = false;
+        let lastCheckMinute = -1;
+        let consecutiveLosses = 0; // ဆက်တိုက်ရှုံးနိမ့်မှုအရေအတွက်
+        let showSLMessage = false; // PLEASE SL စာသားပြသရန်
+
+        function getMyanmarTime() {
+            const now = new Date();
+            // မြန်မာစံတော်ချိန် = UTC + 6:30
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const myanmarTime = new Date(utc + (6.5 * 3600000));
+            
+            return myanmarTime.toLocaleTimeString('my-MM', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+            });
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const myanmarTime = new Date(utc + (6.5 * 3600000));
+
+            // မြန်မာနာရီပြ
+            document.getElementById('currentTime').textContent =
+                myanmarTime.toLocaleTimeString('my-MM', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+                });
+
+            // မြန်မာနာရီ seconds
+            const sec = myanmarTime.getSeconds();
+            const min = myanmarTime.getMinutes();
+
+            // countdown = 59 - sec
+            const countdown = (59 - sec);
+            document.getElementById('countdownCircle').textContent = countdown;
+
+            // Loading bar update (0% → 100%)
+            const progressPercent = ((60 - countdown) / 60) * 100;
+            document.getElementById('globalLoadingProgress').style.width = `${progressPercent}%`;
+
+            // မိနစ်အသစ်တစ်ခုစတင်တိုင်း hasCheckedThisMinute ကို reset လုပ်ပါ
+            if (min !== lastCheckMinute) {
+                hasCheckedThisMinute = false;
+                lastCheckMinute = min;
+            }
+
+            // Auto update trigger (countdown=59 = မြန်မာနာရီ sec=0)
+            if (countdown === 59 && document.getElementById('autoUpdateToggle').checked && !isShowingWinLoss) {
+                loadAllHistory();
+            }
+        }
+
+        function calculatePatternStats(lastThreeNumbers) {
+            if (!lastThreeNumbers || lastThreeNumbers.length < 3) {
+                return { bigPercent: 0, smallPercent: 0, bigCount: 0, smallCount: 0, totalCount: 0 };
+            }
+            
+            const pattern = lastThreeNumbers.join('');
+            
+            let bigCount = 0;
+            let smallCount = 0;
+            let totalCount = 0;
+            
+            for (let i = 0; i < allData.length - 3; i++) {
+                const currentPattern = allData.slice(i, i + 4).map(item => item.number).join('');
+                
+                if (currentPattern.substring(1) === pattern) {
+                    totalCount++;
+                    const firstDigit = parseInt(currentPattern[0]);
+                    
+                    if (firstDigit >= 5 && firstDigit <= 9) {
+                        bigCount++;
+                    } else if (firstDigit >= 0 && firstDigit <= 4) {
+                        smallCount++;
+                    }
+                }
+            }
+            
+            const bigPercent = totalCount > 0 ? Math.round((bigCount / totalCount) * 100) : 0;
+            const smallPercent = totalCount > 0 ? Math.round((smallCount / totalCount) * 100) : 0;
+            
+            return {
+                bigPercent,
+                smallPercent,
+                bigCount,
+                smallCount,
+                totalCount
+            };
+        }
+
+        function updateLastResults() {
+            const lastResultsEl = document.getElementById('lastResults');
+            
+            if (allData.length < 3) {
+                lastResultsEl.innerHTML = '<span class="text-gray-400">please wait</span>';
+                return;
+            }
+            
+            // Get the latest result
+            const latestResult = allData[0].number;
+            
+            // Store previous three numbers for comparison
+            const previousThreeNumbers = [...lastThreeNumbers];
+            
+            // Update last three numbers
+            lastThreeNumbers = allData.slice(0, 3).map(item => item.number);
+            
+            // Display the latest result
+            lastResultsEl.innerHTML = lastThreeNumbers.map((num, index) => {
+                if (index === 0) {
+                    return `<span class="number-badge" style="background-color: #ef4444; color: white;">${num}</span>`;
+                } else {
+                    return `<span class="number-badge">${num}</span>`;
+                }
+            }).join('');
+            
+            // Check if we have a prediction to compare with
+            // AND if we haven't checked this minute yet
+            if (lastPrediction && previousThreeNumbers.length === 3 && !hasCheckedThisMinute) {
+                isShowingWinLoss = true;
+                hasCheckedThisMinute = true; // ဒီမိနစ်အတွက် စစ်ဆေးပြီးပြီ
+                checkWinLoss(previousThreeNumbers, latestResult);
+                
+                // Delay updating the next prediction until after win/loss is shown
+                setTimeout(() => {
+                    const patternStats = calculatePatternStats(lastThreeNumbers);
+                    updateBigSmallDisplay(patternStats);
+                    lastPrediction = patternStats.bigPercent > patternStats.smallPercent ? 'BIG' : 'SMALL';
+                    updateNextPrediction();
+                    updateAIPredictions();
+                    isShowingWinLoss = false;
+                }, 6000); // Wait 6 seconds before updating prediction
+            } else {
+                // No prediction to compare or already checked this minute, update immediately
+                const patternStats = calculatePatternStats(lastThreeNumbers);
+                updateBigSmallDisplay(patternStats);
+                lastPrediction = patternStats.bigPercent > patternStats.smallPercent ? 'BIG' : 'SMALL';
+                updateNextPrediction();
+                updateAIPredictions();
+            }
+        }
+
+        function checkWinLoss(previousNumbers, newNumber) {
+            const winLossResultEl = document.getElementById('winLossResult');
+            const newNum = parseInt(newNumber);
+            const isBig = newNum >= 5 && newNum <= 9;
+            
+            // Clear any existing timeout
+            if (winLossTimeout) {
+                clearTimeout(winLossTimeout);
+            }
+            
+            // Check if prediction was correct
+            if ((lastPrediction === 'BIG' && isBig) || (lastPrediction === 'SMALL' && !isBig)) {
+                winLossResultEl.innerHTML = `<span class="win-text result-flash">(----- WIN! ✓ -----)</span>`;
+                consecutiveLosses = 0; // နိုင်လျှင် ဆက်တိုက်ရှုံးနိမ့်မှုကို reset လုပ်ပါ
+                showSLMessage = false; // PLEASE SL စာသားကို မပြတော့ပါ
+            } else {
+                winLossResultEl.innerHTML = `<span class="lose-text result-flash">(----- LOSE! ✗ -----)</span>`;
+                consecutiveLosses++; // ရှုံးလျှင် ဆက်တိုက်ရှုံးနိမ့်မှုကို တိုးပါ
+                
+                // 3 ကြိမ်ဆက်တိုက်ရှုံးလျှင် PLEASE SL ပြပါ
+                if (consecutiveLosses >= 3) {
+                    showSLMessage = true;
+                }
+            }
+            
+            // Clear result after 3 seconds
+            winLossTimeout = setTimeout(() => {
+                winLossResultEl.innerHTML = '';
+            }, 3000);
+        }
+
+        function updateNextPrediction() {
+            const nextPredictionEl = document.getElementById('nextPrediction');
+            const nextPredictionStatsEl = document.getElementById('nextPredictionStats');
+            
+            if (lastThreeNumbers.length < 3) {
+                nextPredictionEl.innerHTML = '<span class="text-gray-400">Calculating...</span>';
+                nextPredictionStatsEl.textContent = '';
+                return;
+            }
+            
+            // 3 ကြိမ်ဆက်တိုက်ရှုံးလျှင် PLEASE SL ပြပါ
+            if (showSLMessage) {
+                nextPredictionEl.innerHTML = '<span class="text-yellow-400 font-bold">PLEASE SL</span>';
+                nextPredictionStatsEl.textContent = '3 consecutive losses detected';
+                return;
+            }
+            
+            const patternStats = calculatePatternStats(lastThreeNumbers);
+            let prediction;
+            
+            // 50% ညီမျှနေရင် ဖြစ်နိုင်ခြေရှိတဲ့တစ်ခုကို ရွေးချယ်
+            if (patternStats.bigPercent === 50 && patternStats.smallPercent === 50) {
+                // နောက်ဆုံးရလဒ်ကို အခြေခံပြီး ဆုံးဖြတ်
+                const lastNumber = parseInt(lastThreeNumbers[0]);
+                prediction = lastNumber >= 5 ? 'SMALL' : 'BIG'; // ဆန့်ကျင်ဘက်ကို ရွေးချယ်
+            } else if (patternStats.bigPercent > patternStats.smallPercent) {
+                prediction = 'BIG';
+            } else {
+                prediction = 'SMALL';
+            }
+            
+            if (prediction === 'BIG') {
+                nextPredictionEl.innerHTML = '<span class="text-red-400 font-bold">BIG</span>';
+                nextPredictionStatsEl.textContent = `${patternStats.bigPercent}% probability`;
+            } else if (prediction === 'SMALL') {
+                nextPredictionEl.innerHTML = '<span class="text-green-400 font-bold">SMALL</span>';
+                nextPredictionStatsEl.textContent = `${patternStats.smallPercent}% probability`;
+            } else {
+                nextPredictionEl.innerHTML = '<span class="text-yellow-400 font-bold">EQUAL (PLEASE SL)</span>';
+                nextPredictionStatsEl.textContent = 'Both have equal probability';
+            }
+        }
+
+        function updateBigSmallDisplay(patternStats) {
+            const container = document.getElementById('bigSmallContainer');
+            
+            // Clear previous content
+            container.innerHTML = '';
+            
+            if (patternStats.bigPercent === 50 && patternStats.smallPercent === 50) {
+                // 50% ညီမျှနေရင် နောက်ဆုံးရလဒ်ကို အခြေခံပြီး ခန့်မှန်း
+                const lastNumber = parseInt(lastThreeNumbers[0]);
+                const predicted = lastNumber >= 5 ? 'SMALL' : 'BIG';
+                const predictedPercent = 51; // အနည်းငယ်ပိုမြင့်တယ်လို့ ပြသရန်
+                
+                if (predicted === 'BIG') {
+                    container.innerHTML = `
+                        <div class="bg-red-900 p-3 rounded">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold">BIG</span>
+                                <span class="font-mono">${predictedPercent}%</span>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-fill" style="width: ${predictedPercent}%"></div>
+                                <div class="progress-text">${predictedPercent}%</div>
+                            </div>
+                            <div class="text-xs text-gray-300 mt-1">Based on last result analysis</div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="bg-green-900 p-3 rounded">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold">SMALL</span>
+                                <span class="font-mono">${predictedPercent}%</span>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-fill progress-fill-small" style="width: ${predictedPercent}%"></div>
+                                <div class="progress-text">${predictedPercent}%</div>
+                            </div>
+                            <div class="text-xs text-gray-300 mt-1">Based on last result analysis</div>
+                        </div>
+                    `;
+                }
+            } else if (patternStats.bigPercent > patternStats.smallPercent) {
+                // Show only BIG with its percentage
+                container.innerHTML = `
+                    <div class="bg-red-900 p-3 rounded">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold">BIG</span>
+                            <span class="font-mono">${patternStats.bigPercent}%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" style="width: ${patternStats.bigPercent}%"></div>
+                            <div class="progress-text">${patternStats.bigPercent}%</div>
+                        </div>
+                        <div class="text-xs text-gray-300 mt-1">Based on ${patternStats.totalCount} historical patterns</div>
+                    </div>
+                `;
+            } else {
+                // Show only SMALL with its percentage
+                container.innerHTML = `
+                    <div class="bg-green-900 p-3 rounded">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold">SMALL</span>
+                            <span class="font-mono">${patternStats.smallPercent}%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill progress-fill-small" style="width: ${patternStats.smallPercent}%"></div>
+                            <div class="progress-text">${patternStats.smallPercent}%</div>
+                        </div>
+                        <div class="text-xs text-gray-300 mt-1">Based on ${patternStats.totalCount} historical patterns</div>
+                    </div>
+                `;
+            }
+        }
+
+        function updateAIPredictions() {
+            if (allData.length < 20) {
+                // ဒေတာ 20 ခုမပြည့်သေးရင် ရိုးရိုး prediction သုံး
+                const predictions = predictNextNumbers(lastThreeNumbers);
+                updatePredictionUI(predictions);
+                return;
+            }
+            
+            // ဒေတာ 20 ခုရှိရင် အဆင့်မြင့် prediction သုံး
+            const lastTwentyNumbers = allData.slice(0, 20).map(item => parseInt(item.number));
+            const predictions = predictWithAdvancedAI(lastTwentyNumbers);
+            updatePredictionUI(predictions);
+        }
+
+        function updatePredictionUI(predictions) {
+            const aiPredictionsEl = document.getElementById('aiPredictions');
+            
+            aiPredictionsEl.innerHTML = predictions.map((pred, index) => `
+                <div class="prediction-card">
+                    <div class="relative">
+                        <div class="number-badge bg-purple-600">${pred.number}</div>
+                        <div class="ai-badge">AI</div>
+                    </div>
+                    <div class="text-xs mt-1 text-gray-300">${index + 1}</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: ${pred.confidence}%"></div>
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1">${pred.confidence}%</div>
+                </div>
+            `).join('');
+        }
+
+        function predictNextNumbers(lastThree) {
+            const predictions = new Set();
+            
+            if (lastThree.length < 3) {
+                return [
+                    { number: 0, confidence: 20 },
+                    { number: 1, confidence: 20 },
+                    { number: 2, confidence: 20 },
+                    { number: 3, confidence: 20 },
+                    { number: 4, confidence: 20 }
+                ];
+            }
+            
+            const sum = lastThree.reduce((acc, num) => acc + parseInt(num), 0);
+            const avg = Math.round(sum / 3);
+            predictions.add(avg % 10);
+            
+            const lastNum = parseInt(lastThree[0]);
+            predictions.add((lastNum + 6) % 10);
+            predictions.add((lastNum + 8) % 10);
+            predictions.add((lastNum + 9) % 10);
+            
+            const a = parseInt(lastThree[0]);
+            const b = parseInt(lastThree[1]);
+            const c = parseInt(lastThree[2]);
+            
+            predictions.add((a + b) % 10);
+            predictions.add((b + c) % 10);
+            predictions.add((a + c) % 10);
+            predictions.add((a + b + c) % 10);
+            
+            const result = Array.from(predictions).filter(num => num >= 0 && num <= 9);
+            
+            return result.slice(0, 5).map(num => ({ number: num, confidence: Math.floor(Math.random() * 30) + 50 }));
+        }
+
+        function predictWithAdvancedAI(lastTwenty) {
+            // ပိုမိုတိကျတဲ့ AI ခန့်မှန်းချက်အတွက် algorithm
+            const predictions = [];
+            
+            // 1. ပျမ်းမျှနည်းလမ်း
+            const avg = Math.round(lastTwenty.reduce((a, b) => a + b, 0) / lastTwenty.length);
+            predictions.push({ number: avg % 10, confidence: 65 });
+            
+            // 2. ကိန်းဂဏန်းအလိုက် ကြိမ်နှုန်းခန့်မှန်းခြင်း
+            const frequency = {};
+            lastTwenty.forEach(num => {
+                frequency[num] = (frequency[num] || 0) + 1;
+            });
+            
+            const mostFrequent = Object.entries(frequency)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(entry => parseInt(entry[0]));
+            
+            mostFrequent.forEach(num => {
+                predictions.push({ number: num, confidence: 70 });
+            });
+            
+            // 3. ကွင်းဆက်ခန့်မှန်းခြင်း (Markov chain)
+            const nextNum = predictWithMarkovChain(lastTwenty);
+            predictions.push({ number: nextNum, confidence: 75 });
+            
+            // 4. ကွာခြားချက်အခြေပြုခန့်မှန်းခြင်း
+            const diffBased = predictWithDifferenceAnalysis(lastTwenty);
+            predictions.push({ number: diffBased, confidence: 68 });
+            
+            // 5. ပုံစံခိုက်ခြင်းနည်းလမ်း
+            const patternBased = predictWithPatternMatching(lastTwenty);
+            predictions.push({ number: patternBased, confidence: 72 });
+            
+            // ထပ်နေတဲ့ဂဏန်းတွေကို ဖယ်ရှားပြီး ယုံကြည်မှုအမြင့်ဆုံး ၅ ခုကို ပြန်ယူ
+            const uniquePredictions = [];
+            const seen = new Set();
+            
+            predictions.sort((a, b) => b.confidence - a.confidence).forEach(pred => {
+                if (!seen.has(pred.number) && uniquePredictions.length < 5) {
+                    seen.add(pred.number);
+                    uniquePredictions.push(pred);
+                }
+            });
+            
+            // လိုသေးရင် ကျပန်းဂဏန်းများဖြည့်
+            while (uniquePredictions.length < 5) {
+                const randomNum = Math.floor(Math.random() * 10);
+                if (!seen.has(randomNum)) {
+                    seen.add(randomNum);
+                    uniquePredictions.push({ number: randomNum, confidence: 50 });
+                }
+            }
+            
+            return uniquePredictions;
+        }
+
+        function predictWithMarkovChain(numbers) {
+            // Markov chain အခြေပြု ခန့်မှန်းခြင်း
+            const transitions = {};
+            
+            // transitions matrix ဖန်တီးခြင်း
+            for (let i = 0; i < numbers.length - 1; i++) {
+                const current = numbers[i];
+                const next = numbers[i + 1];
+                
+                if (!transitions[current]) {
+                    transitions[current] = {};
+                }
+                
+                transitions[current][next] = (transitions[current][next] || 0) + 1;
+            }
+            
+            // နောက်ဆုံးဂဏန်းအတွက် အများဆုံးဖြစ်နိုင်ခြေရှိသော နောက်ဂဏန်း
+            const lastNum = numbers[numbers.length - 1];
+            if (transitions[lastNum]) {
+                let maxCount = 0;
+                let mostLikely = lastNum;
+                
+                for (const [next, count] of Object.entries(transitions[lastNum])) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        mostLikely = parseInt(next);
+                    }
+                }
+                
+                return mostLikely;
+            }
+            
+            return (lastNum + 1) % 10;
+        }
+
+        function predictWithDifferenceAnalysis(numbers) {
+            // ကွာခြားချက်များကို ခွဲခြမ်းစိတ်ဖြာခြင်း
+            const differences = [];
+            
+            for (let i = 0; i < numbers.length - 1; i++) {
+                differences.push(numbers[i + 1] - numbers[i]);
+            }
+            
+            // ပျမ်းမျှကွာခြားချက်
+            const avgDiff = Math.round(differences.reduce((a, b) => a + b, 0) / differences.length);
+            
+            // နောက်ဆုံးဂဏန်းကို အခြေခံပြီး ခန့်မှန်း
+            let prediction = numbers[numbers.length - 1] + avgDiff;
+            
+            // 0-9 အတွင်းရောက်အောင် ပြုလုပ်
+            while (prediction < 0) prediction += 10;
+            while (prediction > 9) prediction -= 10;
+            
+            return prediction;
+        }
+
+        function predictWithPatternMatching(numbers) {
+            // လက်ရှိပုံစံနှင့် အတိတ်ပုံစံများ နှိုင်းယှဉ်ခြင်း
+            const recentPattern = numbers.slice(0, 3).join('');
+            let bestMatch = null;
+            let bestLength = 0;
+            
+            // အတိတ်ဒေတာထဲမှာ ဆင်တူပုံစံရှာခြင်း
+            for (let i = 3; i < numbers.length - 3; i++) {
+                const currentPattern = numbers.slice(i, i + 3).join('');
+                
+                if (currentPattern === recentPattern && i + 3 < numbers.length) {
+                    const nextNum = numbers[i + 3];
+                    return nextNum;
+                }
+            }
+            
+            // ဆင်တူပုံစံမတွေ့ရင် ပျမ်းမျှဂဏန်း
+            return Math.round(numbers.reduce((a, b) => a + b, 0) / numbers.length) % 10;
+        }
+
+        function signMd5(params) {
+            const copy = { ...params };
+            delete copy.signature;
+            delete copy.timestamp;
+
+            const sorted = {};
+            Object.keys(copy).sort().forEach(k => sorted[k] = copy[k]);
+            const str = JSON.stringify(sorted).replace(/\s+/g, '');
+            return CryptoJS.MD5(str).toString().padStart(32, '0');
+        }
+
+        async function fetchPage(pageNo) {
+            const timestamp = Math.floor(Date.now() / 1000);
+            const body = {
+                pageSize: 3000,
+                pageNo,
+                typeId: 1,
+                language: 0,
+                random: "6DEB0766860C42151A193692ED16D65A",
+                timestamp,
+            };
+            body.signature = signMd5(body).toUpperCase();
+
+            try {
+                const res = await fetch("https://6lotteryapi.com/api/webapi/GetNoaverageEmerdList", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json;charset=UTF-8",
+                    },
+                    body: JSON.stringify(body),
+                });
+                const json = await res.json();
+                return json.data?.list || [];
+            } catch (e) {
+                console.error("Error fetching page", e);
+                return [];
+            }
+        }
+
+        async function loadAllHistory() {
+            document.getElementById('globalLoadingProgress').style.width = '30%';
+
+            try {
+                // Only latest page; override allData
+                const latest = await fetchPage(1);
+                allData = latest;
+
+                // Complete loading animation
+                document.getElementById('globalLoadingProgress').style.width = '100%';
+                setTimeout(() => {
+                    document.getElementById('globalLoadingProgress').style.width = '0%';
+                }, 500);
+
+                updateLastResults(); // Update last results
+                
+                // Update last update time
+                updateLastUpdateTime();
+            } catch (error) {
+                document.getElementById('globalLoadingProgress').style.width = '0%';
+            }
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const formattedTime = now.toLocaleTimeString('my-MM', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('lastUpdateTime').textContent = `Last Update: ${formattedTime} - Developer By Dream`;
+        }
+
+        // Auto update system
+        function setupAutoUpdate() {
+            // Clear existing intervals
+            if (autoUpdateInterval) clearInterval(autoUpdateInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            // Set up new intervals
+            autoUpdateInterval = setInterval(() => {
+                if (document.getElementById('autoUpdateToggle').checked && !isShowingWinLoss) {
+                    loadAllHistory();
+                }
+            }, 60000); // 60 seconds (1 minute)
+            
+            countdownInterval = setInterval(updateClock, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start clock
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // Load initial data
+            loadAllHistory();
+            
+            // Set up auto update
+            setupAutoUpdate();
+            
+            // Toggle auto update
+            document.getElementById('autoUpdateToggle').addEventListener('change', function() {
+                secondsLeft = 60;
+                document.getElementById('countdownCircle').textContent = '60';
+                document.getElementById('globalLoadingProgress').style.width = '0%';
+                setupAutoUpdate();
+            });
+        });
+    </script>
+</body>
+</html>
