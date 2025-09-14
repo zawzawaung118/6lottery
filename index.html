@@ -12,103 +12,68 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
-        
-        :root {
-            --primary: #8b5cf6;
-            --secondary: #0ea5e9;
-            --accent: #ec4899;
-            --dark: #0f172a;
-            --darker: #020617;
-        }
-        
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--darker), var(--dark));
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #e2e8f0;
             min-height: 100vh;
-            overflow-x: hidden;
         }
         
         .glass-card {
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(30, 41, 59, 0.8);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .prediction-big {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+        
+        .prediction-small {
+            color: #a78bfa;
+            font-weight: bold;
+        }
+        
+        .prediction-skip {
+            color: #9ca3af;
+            font-weight: bold;
         }
         
         .orbitron {
             font-family: 'Orbitron', sans-serif;
         }
         
-        .flip-in {
-            animation: flipIn 0.5s ease-out forwards;
-        }
-        
-        @keyframes flipIn {
-            from {
-                transform: rotateX(90deg);
-                opacity: 0;
-            }
-            to {
-                transform: rotateX(0deg);
-                opacity: 1;
-            }
-        }
-        
-        .pulse {
+        .neural-pulse {
             animation: pulse 2s infinite;
         }
         
-        @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-        
-        .pattern-display {
-            font-family: monospace;
-            letter-spacing: 2px;
-        }
-        
-        .neuron {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(14, 165, 233, 0.15));
-            border: 1px solid rgba(139, 92, 246, 0.3);
+        .sureshot-glow {
+            box-shadow: 0 0 15px rgba(72, 187, 120, 0.5);
+            animation: glow 2s infinite alternate;
         }
         
         .ai-chip {
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1));
-            border: 1px solid rgba(236, 72, 153, 0.3);
+            position: relative;
+            overflow: hidden;
         }
         
-        .sureshot-glow {
-            box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
-        }
-        
-        .history-container {
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
-        }
-        
-        .neural-pulse {
-            animation: neuralPulse 3s infinite;
-        }
-        
-        @keyframes neuralPulse {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; }
-            100% { opacity: 0.8; }
+        .ai-chip::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, #ff0080, #7928ca, #0070f3);
+            border-radius: 16px;
+            animation: border-pulse 3s infinite;
         }
         
         .locked-feature {
-            filter: blur(4px);
-            pointer-events: none;
             position: relative;
         }
         
@@ -118,60 +83,114 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(15, 23, 42, 0.9);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             border-radius: 16px;
             z-index: 10;
         }
         
         .locked-icon {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 50%;
             width: 60px;
             height: 60px;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 50%;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             margin-bottom: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
         }
         
-        /* Custom styles for centered history view */
         .history-item {
             transition: all 0.3s ease;
         }
         
         .history-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(72, 187, 120, 0.5); }
+            to { box-shadow: 0 0 20px rgba(72, 187, 120, 0.8); }
+        }
+        
+        @keyframes border-pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
         }
         
         .prediction-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
         }
         
-        .prediction-big {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
-            color: #93c5fd;
-            border: 1px solid rgba(59, 130, 246, 0.3);
+        .prediction-badge.prediction-big {
+            background: rgba(96, 165, 250, 0.2);
+            border: 1px solid rgba(96, 165, 250, 0.5);
         }
         
-        .prediction-small {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(147, 51, 234, 0.2));
-            color: #d8b4fe;
-            border: 1px solid rgba(168, 85, 247, 0.3);
+        .prediction-badge.prediction-small {
+            background: rgba(167, 139, 250, 0.2);
+            border: 1px solid rgba(167, 139, 250, 0.5);
         }
         
-        .prediction-skip {
-            background: linear-gradient(135deg, rgba(107, 114, 128, 0.2), rgba(75, 85, 99, 0.2));
-            color: #d1d5db;
-            border: 1px solid rgba(107, 114, 128, 0.3);
+        .prediction-badge.prediction-skip {
+            background: rgba(156, 163, 175, 0.2);
+            border: 1px solid rgba(156, 163, 175, 0.5);
+        }
+        
+        .neuron {
+            position: relative;
+        }
+        
+        .neuron::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 0%, rgba(99, 102, 241, 0.1) 50%, transparent 100%);
+            border-radius: 12px;
+            animation: neuron-scan 3s infinite linear;
+            pointer-events: none;
+        }
+        
+        @keyframes neuron-scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .result-icon {
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .skip-badge {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            color: #f59e0b;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -181,40 +200,40 @@
     <div id="navigation-root"></div>
 
     <script>
-      let state = {
-    activeTab: 'history',
-    currentPeriod: '',
-    recentResults: [],
-    history: [],
-    currentPrediction: null,
-    currentStreak: null,
-    selectedItems: [],
-    currentTime: '',
-    currentSeconds: 0,          // Add this line
-    oppositeSeconds: 60,        // Add this line
-    lastFetchedPeriod: null,
-    showPatterns: true,
-    lastLossPeriod: null,
-    consecutiveLosses: 0,
-    skipNext: false,
-    patternStats: {},
-    isLive: false,
-    patternBlacklist: [],
-    sureshotCooldown: 0,
-    stats: {
-        totalWins: 0,
-        totalLosses: 0,
-        skipped: 0,
-        winRate: 0,
-        sureshotWins: 0,
-        sureshotTotal: 0,
-        consecutiveSureshotWins: 0,
-        consecutiveSureshotLosses: 0,
-        aiPatternsGenerated: 0,
-        nineDigitPatterns: 0,
-        tenDigitPatterns: 0
-    }
-};
+        let state = {
+            activeTab: 'history',
+            currentPeriod: '',
+            recentResults: [],
+            history: [],
+            currentPrediction: null,
+            currentStreak: null,
+            selectedItems: [],
+            currentTime: '',
+            currentSeconds: 0,
+            oppositeSeconds: 60,
+            lastFetchedPeriod: null,
+            showPatterns: false, // Hide patterns by default
+            lastLossPeriod: null,
+            consecutiveLosses: 0,
+            skipNext: false,
+            skipCount: 0,
+            patternStats: {},
+            isLive: false,
+            patternBlacklist: [],
+            sureshotCooldown: 0,
+            stats: {
+                totalWins: 0,
+                totalLosses: 0,
+                skipped: 0,
+                winRate: 0,
+                sureshotWins: 0,
+                sureshotTotal: 0,
+                consecutiveSureshotWins: 0,
+                consecutiveSureshotLosses: 0,
+                aiPatternsGenerated: 0,
+                nineDigitPatterns: 0
+            }
+        };
 
         // Constants
         const MAX_HISTORY_ITEMS = 500;
@@ -223,46 +242,51 @@
         const LOSS_STREAK_THRESHOLD = 2;
         const RESULTS_TO_FETCH = 10;
         const MAX_CONSECUTIVE_LOSSES = 3;
-        const PATTERN_LENGTH = 10;
-        const SURESHOT_MIN_MATCH = 9.5;
+        const PATTERN_LENGTH = 9; // Changed to 9 for 9-digit patterns only
+        const SURESHOT_MIN_MATCH = 8.5; // Adjusted for 9-digit patterns
 
         // Prediction Logic
         const getSize = (result) => result >= 5 ? 'B' : 'S';
         const getOpposite = (size) => size === 'B' ? 'S' : 'B';
 
-        // Generate 1000+ AI brain patterns (9-digit and 10-digit)
+        // Generate 1000+ AI brain patterns (9-digit only)
         const generatePatterns = () => {
-            // Core pattern bases
+            // Core pattern bases (9-digit only)
             const basePatterns = [
-                // 9-digit patterns
-                'BBBBBBBBB', 'SSSSSSSSS', 'BBBBSSSSS', 'SSSSBBBBB',
-                'BBBSSSSBB', 'SSSBBBSSS', 'BBSSBBSSB', 'SSBBSBBSS',
-                'BSBSBSBSB', 'SBSBSBSBS', 'BBSBBSBBS', 'SSBSSBSSB',
-                'BBSSBBSSB', 'SSBBSSBBS', 'BSSBSSBSS', 'SBBSBBSBB',
-                'BBBBSSSBB', 'SSSSBBBSS', 'BBBSSSSBB', 'SSSBBBSSS',
-                'BBSSSSBBS', 'SSBBBBSSB', 'BSSSSBSSB', 'SBBBBSSBS',
-                'BBSSBSSBB', 'SSBBSBBSS', 'BSSBBSSBS', 'SBBSBBSBB',
-                'BBSBSSBBS', 'SSBSBSSBS', 'BSBSSBSBS', 'SBSBBSBSB',
-                'BBSSBBSBB', 'SSBBSBBSS', 'BSSBBSBBS', 'SBBSSBBSS',
-                'BBSBBSSBB', 'SSBBSSBBS', 'BSBBSBSBS', 'SBSBSSBSB',
-                'BBSSSSBBB', 'SSBBBBSSS', 'BBSBBBSSB', 'SSBSSBBSB',
-                'BBBSSSBBB', 'SSSBBBSSS', 'BBSSBBSSB', 'SSBBSBBSS',
-                
-                // 10-digit patterns
-                'BBBBBBBBBB', 'SSSSSSSSSS', 'BBBBSSSSSS', 'SSSSBBBBBB',
-                'BBBSSSSBBB', 'SSSBBBSSSB', 'BBSSBBSSBB', 'SSBBSSBBSS',
-                'BSBSBSBSBS', 'SBSBSBSBSB', 'BBSBBSBBSB', 'SSBSSBSSBS',
-                'BBSSBBSSBB', 'SSBBSSBBSS', 'BSSBBSSBSS', 'SBBSSBBSSB',
-                'BBBBSSSSBB', 'SSSSBBBBSS', 'BBBSSSSBBB', 'SSSBBBSSSB',
-                'BBSSSSBBSS', 'SSBBBBSSBB', 'BSSSSBSSSB', 'SBBBBSSBBS',
-                'BBBSBSBSBB', 'SSSBBSBSSS', 'BSBBBSBBBS', 'SBSSSBSSSB',
-                'BBSBBBSBBB', 'SSBSSSBSSS', 'BBBBBSBBBB', 'SSSSSBSSSS',
-                'BBBBSSBBBB', 'SSSSBBSSSS', 'BBBSSBBBBB', 'SSSBBSSSSS',
-                'BBSSBBBBBB', 'SSBBSSSSSS', 'BSSBSSBSSB', 'SBSBSBSBSB'
-            ];
+    "BBBBBBBBB", "SSSSSSSSS", "BBBBSSSSS", "SSSSBBBBB",
+    "BBBSSSSBB", "SSSBBBSSS", "BBSSBBSSB", "SSBBSBBSS",
+    "BSBSBSBSB", "SBSBSBSBS", "BBSBBSBBS", "SSBSSBSSB",
+    "BBSSBBSSB", "SSBBSSBBS", "BSSBSSBSS", "SBBSBBSBB",
+    "BBBBSSSBB", "SSSSBBBSS", "BBBSSSSBB", "SSSBBBSSS",
+    "BBSSSSBBS", "SSBBBBSSB", "BSSSSBSSB", "SBBBBSSBS",
+    "BBSSBSSBB", "SSBBSBBSS", "BSSBBSSBS", "SBBSBBSBB",
+    "BBSBSSBBS", "SSBSBSSBS", "BSBSSBSBS", "SBSBBSBSB",
+    "BBSSBBSBB", "SSBBSBBSS", "BSSBBSBBS", "SBBSSBBSS",
+    "BBSBBSSBB", "SSBBSSBBS", "BSBBSBSBS", "SBSBSSBSB",
+    "BBSSSSBBB", "SSBBBBSSS", "BBSBBBSSB", "SSBSSBBSB",
+    "BBBSSSBBB", "SSSBBBSSS", "BBSSBBSSB", "SSBBSBBSS",
+    "SSBBSSSSB", "BBBBBSSSB", "SSSSSSBBB", "BBSSSSSSS",
+    "SSSSBBSSS", "BBBSBSSSB", "BBBBSSBBS", "SSBBSSSSB",
+    "SBBSSSBBB", "BSSSSSBBB", "SSSSBBBSB", "BBSBSBBSS",
+    "SSBSSBSSS", "BBSSBBBSB", "SSBBSSBBB", "BBBBBSSSS",
+    "BSSSBBSSS", "SSBBBSSBB", "BBBBBSSSB", "SSSSSBBBS",
+    "BBSSSBBSS", "SSSBBBBBB", "SSBBSSSSB", "BBBBBBSSS",
+    "SSSSBBSSS", "BSSSBSSSB", "SSSSSBBBB", "BBSSSSBBB",
+    "BBBBSSSSS", "SSBBSSSSS", "BBSBBSSSS", "SSBSSSSBB",
+    "BBSSBBSSS", "SSBBSBBBS", "BSSSSBBSS", "BBSBSSSSB",
+    "BBSSSSSSS", "BSSSSBSSS", "BSSBBSSBB", "SSBBSSBSS",
+    "BSSBSSSSB", "SSBBSBBSS", "SBBSSSSBB", "BBBSBSSBB",
+    "SSBBBBBSS", "SSBBSSBBS", "SBBBBSSBB", "BSSBSSSBB",
+    "BBSSSSBSS", "BBBBSSBBS", "SBBSSBBSS", "SSBBSSBBS",
+    "SSBBSBBBS", "BSSSBBBSB", "SBSBBSSSB", "SSBBBBBBS",
+    "BBBSBSBSS", "BBSSSBBBS", "BBBBSSBBSS", "SSBBBSBBSS",
+    "SSBBSSSBB", "BBSBBBSBB", "SSSSBBSSB", "BBSSBBSSS",
+    "SSSSSSBBBS", "BSSBBSBBBS", "BBBBSSSSBB", "BBSSBBBBSS",
+    "BBSSSSSSB", "BSSSBBSSS", "BSSBBSSBB", "SSBBSSSBB"
+];
 
             // Neural transformation functions
-            const transforms = [
+             const transforms = [
                 p => p.replace(/B{3}/g, 'SBS').replace(/S{3}/g, 'BSB'),
                 p => p.split('').reverse().join(''),
                 p => p.replace(/(.{2})/g, '$1$1').substring(0, p.length),
@@ -274,13 +298,9 @@
             ];
 
             // Generate 9-digit patterns (1000+)
-            let nineDigitPatterns = basePatterns.filter(p => p.length === 9);
-            basePatterns.filter(p => p.length !== 9).forEach(p => {
-                nineDigitPatterns.push(p.substring(0, 9));
-                nineDigitPatterns.push(p.substring(p.length-9));
-            });
+            let nineDigitPatterns = [...basePatterns];
             
-            // Apply transformations
+            // Apply transformations to generate more patterns
             let transformedNine = [];
             nineDigitPatterns.forEach(p => {
                 transforms.forEach(t => {
@@ -299,42 +319,16 @@
             }
             nineDigitPatterns = nineDigitPatterns.slice(0, 1000);
 
-            // Generate 10-digit patterns (1000+)
-            let tenDigitPatterns = basePatterns.filter(p => p.length === 10);
-            basePatterns.filter(p => p.length !== 10).forEach(p => {
-                tenDigitPatterns.push((p + p).substring(0, 10));
-            });
-            
-            // Apply transformations
-            let transformedTen = [];
-            tenDigitPatterns.forEach(p => {
-                transforms.forEach(t => {
-                    transformedTen.push(t(p));
-                });
-            });
-            tenDigitPatterns = [...new Set([...tenDigitPatterns, ...transformedTen])];
-            
-            // Generate more to reach 1000+
-            while (tenDigitPatterns.length < 1000) {
-                let pattern = '';
-                for (let i = 0; i < 10; i++) {
-                    pattern += Math.random() < 0.5 ? 'B' : 'S';
-                }
-                tenDigitPatterns.push(pattern);
-            }
-            tenDigitPatterns = tenDigitPatterns.slice(0, 1000);
-
-            // Update stats
+            // Update stats (removed 10-digit pattern stats)
             state.stats.nineDigitPatterns = nineDigitPatterns.length;
-            state.stats.tenDigitPatterns = tenDigitPatterns.length;
-            state.stats.aiPatternsGenerated = nineDigitPatterns.length + tenDigitPatterns.length;
+            state.stats.aiPatternsGenerated = nineDigitPatterns.length;
 
-            return [...nineDigitPatterns, ...tenDigitPatterns];
+            return nineDigitPatterns;
         };
 
         const predictionPatterns = generatePatterns();
 
-        // Enhanced Sureshot verification
+        // Enhanced Sureshot verification (adjusted for 9-digit patterns)
         const isTrueSureshot = (pattern, currentPattern, matchCount, lastSegmentMatch) => {
             // Layer 1: Exact match requirements
             if (matchCount < SURESHOT_MIN_MATCH) return false;
@@ -348,7 +342,7 @@
             }
             
             // Layer 3: Continuity check
-            if (!pattern.startsWith(currentPattern.substring(0, 7))) return false;
+            if (!pattern.startsWith(currentPattern.substring(0, 6))) return false;
             if (!pattern.endsWith(currentPattern.slice(-3))) return false;
             
             // Layer 4: Blacklist check
@@ -358,20 +352,10 @@
         };
 
         const generatePrediction = (results) => {
-            if (state.skipNext || state.sureshotCooldown > 0) {
-                if (state.sureshotCooldown > 0) state.sureshotCooldown--;
-                return {
-                    prediction: 'SKIP',
-                    confidence: 'SAFETY',
-                    pattern: 'LOSS_PREVENTION',
-                    description: 'Safety cooldown active'
-                };
-            }
-
             if (results.length < PATTERN_LENGTH) return null;
             
-            const lastTen = results.slice(0, PATTERN_LENGTH).map(r => getSize(r.result));
-            const currentPattern = lastTen.join('');
+            const lastNine = results.slice(0, PATTERN_LENGTH).map(r => getSize(r.result));
+            const currentPattern = lastNine.join('');
             
             // Multi-stage pattern matching
             const matches = [];
@@ -402,7 +386,7 @@
                 if (isSureshot) {
                     // Additional real-time validation
                     const similarPatterns = predictionPatterns.filter(p => 
-                        p !== pattern && p.startsWith(currentPattern.substring(0, 6))
+                        p !== pattern && p.startsWith(currentPattern.substring(0, 5))
                     );
                     
                     const conflicting = similarPatterns.some(p => 
@@ -418,12 +402,12 @@
                             continuity: pattern.endsWith(currentPattern.slice(-3))
                         });
                     }
-                } else if (matchCount >= 8) {
+                } else if (matchCount >= 7) {
                     matches.push({
                         pattern,
                         matchCount,
                         prediction: nextPred,
-                        confidence: matchCount >= 9 ? 'HIGH' : ''
+                        confidence: matchCount >= 8 ? 'HIGH' : ''
                     });
                 }
             }
@@ -438,13 +422,12 @@
                 
                 const bestSureshot = sureshotMatches[0];
                 state.stats.sureshotTotal++;
-                state.sureshotCooldown = 2;
                 
                 return {
                     prediction: bestSureshot.prediction,
                     confidence: 'SURESHOT',
                     pattern: bestSureshot.pattern,
-                    description: `AI Verified Sureshot (${Math.round(bestSureshot.matchCount*10)/10}/10 exact match)`,
+                    description: `AI Verified Sureshot (${Math.round(bestSureshot.matchCount*10)/10}/9 exact match)`,
                     matchCount: bestSureshot.matchCount,
                     isSureshot: true
                 };
@@ -463,7 +446,7 @@
                 });
                 
                 const bestMatch = matches[0];
-                const confidence = bestMatch.matchCount >= 9 ? 'HIGH' : 'MODERATE';
+                const confidence = bestMatch.matchCount >= 8 ? 'HIGH' : 'MODERATE';
                 
                 return {
                     prediction: bestMatch.prediction,
@@ -474,8 +457,15 @@
                 };
             }
             
-            // No good matches found
-            return null;
+            // No good matches found - generate a random prediction instead of skipping
+            const randomPrediction = Math.random() < 0.5 ? 'BIG' : 'SMALL';
+            return {
+                prediction: randomPrediction,
+                confidence: 'MODERATE',
+                pattern: 'RANDOM_GENERATED',
+                description: 'Random prediction (no pattern match)',
+                matchCount: 4.5
+            };
         };
 
         const fetchGameResult = async () => {
@@ -572,7 +562,6 @@
                                 state.stats.consecutiveSureshotWins = 0;
                                 console.error("CRITICAL: Sureshot prediction failed!", item);
                                 state.patternBlacklist.push(item.pattern);
-                                state.skipNext = true;
                                 state.consecutiveLosses = MAX_CONSECUTIVE_LOSSES;
                             }
                         } else {
@@ -604,8 +593,13 @@
                 return item;
             });
 
-            if (state.consecutiveLosses >= MAX_CONSECUTIVE_LOSSES) {
+            // Check if we need to skip based on consecutive losses
+            if (state.consecutiveLosses >= 3) {
                 state.skipNext = true;
+                state.skipCount = 2; // Skip 2 times
+            } else if (state.skipCount > 0) {
+                state.skipNext = true;
+                state.skipCount--;
             } else {
                 state.skipNext = false;
             }
@@ -627,6 +621,17 @@
                 predictionData = generatePrediction(state.recentResults);
             }
 
+            // If we need to skip, override the prediction
+            if (state.skipNext) {
+                predictionData = {
+                    prediction: 'ခဏနေမှပြန်လာခက်',
+                    confidence: 'PREDICATION ဆက်ပြမည်မဟုတ်ပါ ',
+                    pattern: 'SAFETY_SKIP',
+                    description: 'Skipping due to consecutive losses',
+                    matchCount: 0
+                };
+            }
+
             const newPrediction = predictionData ? {
                 id: `${newPeriod}-${Date.now()}`,
                 period: newPeriod,
@@ -642,12 +647,12 @@
             } : {
                 id: `${newPeriod}-${Date.now()}`,
                 period: newPeriod,
-                prediction: 'SKIP',
-                confidence: 'SAFETY',
-                pattern: 'NO_MATCH',
-                status: 'SKIPPED',
+                prediction: 'BIG', // Default to BIG instead of SKIP
+                confidence: 'MODERATE',
+                pattern: 'DEFAULT',
+                status: 'PENDING',
                 timestamp: Date.now(),
-                description: 'No high-confidence pattern matched'
+                description: 'Default prediction (no pattern match)'
             };
 
             state.currentPrediction = newPrediction;
@@ -660,46 +665,42 @@
         };
 
         // Update the updateTime function to include opposite seconds
-const updateTime = () => {
-    const now = new Date();
-    const seconds = now.getSeconds();
-    const oppositeSeconds = 60 - seconds; // Calculate opposite seconds
-    
-    state.currentTime = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
-    state.currentSeconds = seconds;
-    state.oppositeSeconds = oppositeSeconds;
-    
-    const timeElement = document.getElementById('ist-time');
-    const secondsElement = document.getElementById('current-seconds');
-    const oppositeElement = document.getElementById('opposite-seconds');
-    
-    if (timeElement) timeElement.textContent = `IST: ${state.currentTime}`;
-    if (secondsElement) secondsElement.textContent = ``;
-    if (oppositeElement) oppositeElement.textContent = `NEXT RESULT ♻ ${oppositeSeconds}`;
-};
+        const updateTime = () => {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            const oppositeSeconds = 60 - seconds; // Calculate opposite seconds
+            
+            state.currentTime = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });
+            state.currentSeconds = seconds;
+            state.oppositeSeconds = oppositeSeconds;
+            
+            const timeElement = document.getElementById('ist-time');
+            const secondsElement = document.getElementById('current-seconds');
+            const oppositeElement = document.getElementById('opposite-seconds');
+            
+            if (timeElement) timeElement.textContent = `IST: ${state.currentTime}`;
+            if (secondsElement) secondsElement.textContent = ``;
+            if (oppositeElement) oppositeElement.textContent = `NEXT RESULT ♻ ${oppositeSeconds}`;
+        };
 
         // UI Components
         const ConfidenceIndicator = (confidence) => {
-            const styles = {
-                SURESHOT: { color: 'bg-gradient-to-r from-green-500 to-emerald-500 text-white', text: 'SURESHOT' },
-                HIGH: { color: 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white', text: 'HIGH' },
-                MODERATE: { color: 'bg-gradient-to-r from-yellow-500 to-amber-500 text-black', text: 'MODERATE' },
-                STREAK: { color: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white', text: 'STREAK' },
-                SAFETY: { color: 'bg-gradient-to-r from-gray-500 to-gray-700 text-white', text: 'SAFETY' }
-            };
-            const style = styles[confidence] || { color: 'bg-gray-500 text-white', text: 'UNKNOWN' };
-            return `<span class="text-xs px-3 py-1.5 rounded-full font-bold ${style.color}">${style.text}</span>`;
+            // Return empty string to hide confidence indicators
+            return '';
         };
 
         const StatusIcon = (status) => {
-            const icons = {
-                WIN: { icon: 'check-circle', color: 'text-green-400', animation: 'flip-in' },
-                LOSS: { icon: 'x-circle', color: 'text-red-400', animation: 'flip-in' },
-                PENDING: { icon: 'clock', color: 'text-yellow-400 pulse', animation: '' },
-                SKIPPED: { icon: 'skip-forward', color: 'text-gray-400', animation: '' }
-            };
-            const statusInfo = icons[status] || { icon: 'help-circle', color: 'text-gray-400', animation: '' };
-            return `<i data-lucide="${statusInfo.icon}" class="w-5 h-5 ${statusInfo.color} ${statusInfo.animation}"></i>`;
+            // Return empty string to hide status icons
+            return '';
+        };
+
+        const ResultIcon = (status) => {
+            if (status === 'WIN') {
+                return `<span class="result-icon"><i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i></span>`;
+            } else if (status === 'LOSS') {
+                return `<span class="result-icon"><i data-lucide="x-circle" class="w-4 h-4 text-red-400"></i></span>`;
+            }
+            return '';
         };
 
         const getStats = () => {
@@ -729,8 +730,7 @@ const updateTime = () => {
                 consecutiveSureshotWins: state.stats.consecutiveSureshotWins,
                 consecutiveSureshotLosses: state.stats.consecutiveSureshotLosses,
                 aiPatterns: state.stats.aiPatternsGenerated,
-                nineDigitPatterns: state.stats.nineDigitPatterns,
-                tenDigitPatterns: state.stats.tenDigitPatterns
+                nineDigitPatterns: state.stats.nineDigitPatterns
             };
         };
 
@@ -819,18 +819,6 @@ const updateTime = () => {
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="glass-card p-4 rounded-xl neuron">
-                                <div class="flex items-center">
-                                    <div class="p-2 bg-gradient-to-br from-pink-600 to-rose-700 rounded-lg mr-3">
-                                        <i data-lucide="hash" class="text-white"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm text-gray-400">10-Digit Patterns</p>
-                                        <p class="text-2xl font-bold text-pink-400">${stats.tenDigitPatterns}+</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     
@@ -888,7 +876,7 @@ const updateTime = () => {
                             
                             <div class="text-center py-4">
                                 <div class="text-5xl font-bold ${predColor} mb-2 orbitron">${pred?.prediction || '---'}</div>
-                                ${pred?.matchCount ? `<div class="text-gray-400 text-sm">AI matched ${Math.round(pred.matchCount*10)/10}/10</div>` : ''}
+                                ${pred?.matchCount ? `<div class="text-gray-400 text-sm">AI matched ${Math.round(pred.matchCount*10)/10}/9</div>` : ''}
                                 ${pred?.isSureshot ? `<div class="mt-2 text-xs bg-green-900/50 text-green-300 rounded-full px-2 py-1 inline-block sureshot-glow">100% WIN GUARANTEE</div>` : ''}
                             </div>
                             
@@ -1010,89 +998,93 @@ const updateTime = () => {
                 </div>
             `;
         };
-const HistoryPage = () => {
-    const stats = getStats();
-    
-    return `
-        <div class="pt-6">
-            <div class="flex flex-col items-center mb-6">
-                <h1 class="text-3xl font-bold orbitron text-center mb-2">777-BIG WIN-1 MIN WINGO</h1>
-                
-                <div class="flex items-center px-3 py-1.5 ${state.isLive ? 'bg-gradient-to-r from-green-700 to-emerald-800' : 'bg-gradient-to-r from-red-700 to-orange-800'} rounded-full mb-4">
-                    <div class="w-2 h-2 ${state.isLive ? 'bg-green-400' : 'bg-red-400'} rounded-full mr-2 animate-pulse"></div>
-                    <span class="text-xs font-bold">${state.isLive ? 'AI-ESTIMATE' : 'RESULT'}</span>
-                </div>
-                
-                <!-- Add seconds display here -->
-                <div class="glass-card p-3 mb-4 text-center w-full max-w-xs">
-                    <div id="current-seconds" class="text-sm text-gray-400"></div>
-                    <div id="opposite-seconds" class="text-lg font-bold text-purple-400">NEXT RESULT ♻  ${state.oppositeSeconds || 60}</div>
-                </div>
-            </div>
+
+        const HistoryPage = () => {
+            const stats = getStats();
             
-            <div class="history-container px-2">
-                ${state.history.length === 0 ? `
-                    <div class="glass-card p-12 text-center">
-                        <i data-lucide="database" class="mx-auto text-gray-500 w-12 h-12 mb-4"></i>
-                        <h3 class="text-lg font-bold text-gray-400">ကျေးဇူးပြု၍ ခဏစောင့်ပါ....</h3>
+            return `
+                <div class="pt-6">
+                    <div class="flex flex-col items-center mb-6">
+                        <h1 class="text-3xl font-bold orbitron text-center mb-2">777-BIG WIN-1 MIN WINGO</h1>
+                        
+                        <div class="flex items-center px-3 py-1.5 ${state.isLive ? 'bg-gradient-to-r from-green-700 to-emerald-800' : 'bg-gradient-to-r from-red-700 to-orange-800'} rounded-full mb-4">
+                            <div class="w-2 h-2 ${state.isLive ? 'bg-green-400' : 'bg-red-400'} rounded-full mr-2 animate-pulse"></div>
+                            <span class="text-xs font-bold">${state.isLive ? 'AI-ESTIMATE' : 'RESULT'}</span>
+                        </div>
+                        
+                        <!-- Add seconds display here -->
+                        <div class="glass-card p-3 mb-4 text-center w-full max-w-xs">
+                            <div id="current-seconds" class="text-sm text-gray-400"></div>
+                            <div id="opposite-seconds" class="text-lg font-bold text-purple-400">NEXT RESULT ♻  ${state.oppositeSeconds || 60}</div>
+                        </div>
                     </div>
-                ` : `
-                    <div class="space-y-4">
-                        ${state.history.map(item => {
-                            const statusStyles = {
-                                WIN: 'border-green-500/30',
-                                LOSS: 'border-red-500/30',
-                                PENDING: 'border-yellow-500/30',
-                                SKIPPED: 'border-gray-500/30',
-                            }[item.status] || 'border-gray-500/30';
-                            
-                            const predictionColors = {
-                                BIG: 'prediction-big',
-                                SMALL: 'prediction-small',
-                                SKIP: 'prediction-skip'
-                            }[item.prediction] || 'text-gray-400';
-                            
-                            return `
-                            <div class="glass-card p-5 rounded-xl border ${statusStyles} ${item.isSureshot ? 'neuron sureshot-glow' : ''} history-item">
-                                <div class="flex flex-col">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <div class="flex items-center">
-                                            <span class="font-mono font-bold text-gray-300 text-lg">${item.period}</span></div>
-                                            <span class="ml-3 prediction-badge ${predictionColors}">${item.prediction}</span>
-                                            ${item.isSureshot ? `<span class="ml-2 px-2 py-1 rounded-full text-xs font-bold bg-green-900/50 text-green-300">SURESHOT</span>` : ''}
-                                        </div>
-                                        
-                                        <div class="text-right">
-                                            ${item.result !== undefined ? `
-                                                <p class="text-sm font-semibold ${item.result >= 5 ? 'text-blue-400' : 'text-purple-400'}"></div></div>
-                                                    ${item.result} (${item.result >= 5 ? 'BIG' : 'SMALL'})
-                                                </p>
+                    
+                    <div class="history-container px-2">
+                        ${state.history.length === 0 ? `
+                            <div class="glass-card p-12 text-center">
+                                <i data-lucide="database" class="mx-auto text-gray-500 w-12 h-12 mb-4"></i>
+                                <h3 class="text-lg font-bold text-gray-400">ကျေးဇူးပြု၍ ခဏစောင့်ပါ....</h3>
+                            </div>
+                        ` : `
+                            <div class="space-y-4">
+                                ${state.history.map(item => {
+                                    const statusStyles = {
+                                        WIN: 'border-green-500/30',
+                                        LOSS: 'border-red-500/30',
+                                        PENDING: 'border-yellow-500/30',
+                                        SKIPPED: 'border-gray-500/30',
+                                    }[item.status] || 'border-gray-500/30';
+                                    
+                                    const predictionColors = {
+                                        BIG: 'prediction-big',
+                                        SMALL: 'prediction-small',
+                                        SKIP: 'prediction-skip'
+                                    }[item.prediction] || 'text-gray-400';
+                                    
+                                    return `
+                                    <div class="glass-card p-5 rounded-xl border ${statusStyles} ${item.isSureshot ? 'neuron sureshot-glow' : ''} history-item">
+                                        <div class="flex flex-col">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <div class="flex items-center">
+                                                    <span class="font-mono font-bold text-gray-300 text-lg">${item.period}</span>
+                                                    <span class="ml-3 prediction-badge ${predictionColors}">
+                                                        ${item.prediction}
+                                                        ${item.status !== 'PENDING' && item.status !== 'SKIPPED' ? ResultIcon(item.status) : ''}
+                                                    </span>
+                                                    ${item.isSureshot ? `<span class="ml-2 px-2 py-1 rounded-full text-xs font-bold bg-green-900/50 text-green-300">SURESHOT</span>` : ''}
+                                                </div>
+                                                
+                                                <div class="text-right">
+                                                    ${item.result !== undefined ? `
+                                                                                  </p>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex items-center flex-wrap gap-2 mb-3">
+                                                ${StatusIcon(item.status)}
+                                                ${ConfidenceIndicator(item.confidence)}
+                                                ${item.matchCount ? `` : ''}
+                                                ${item.status === 'SKIPPED' && item.confidence === 'SAFETY' ? `<span class="skip-badge">Safety Skip</span>` : ''}
+                                            </div>
+                                            
+                                            ${state.showPatterns && item.pattern ? `
+                                                <div class="pt-3 border-t border-gray-700/30">
+                                                    
+                                                    ${item.patternDescription ? `<div class="text-xs text-gray-400 mt-1">${item.patternDescription}</div>` : ''}
+                                                </div>
                                             ` : ''}
                                         </div>
                                     </div>
-                                    
-                                    <div class="flex items-center flex-wrap gap-2 mb-3">
-                                        ${StatusIcon(item.status)}
-                                        ${ConfidenceIndicator(item.confidence)}
-                                        ${item.matchCount ? `<span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-800">${Math.round(item.matchCount*10)/10}/10</span>` : ''}
-                                    </div>
-                                    
-                                    ${state.showPatterns && item.pattern ? `
-                                        <div class="pt-3 border-t border-gray-700/30">
-                                            <div class="text-xs text-gray-400 mb-1">
-                                            ${item.patternDescription ? `<div class="text-xs text-gray-400 mt-1">${item.patternDescription}</div>` : ''}
-                                        </div>
-                                    ` : ''}
-                                </div>
+                                    `;
+                                }).join('')}
                             </div>
-                            `;
-                        }).join('')}
+                        `}
                     </div>
-                `}
-            </div>
-        </div>
-    `;
-};
+                </div>
+            `;
+        };
+
         const PremiumNavigation = () => {
             // Return empty string to hide the navigation
             return '';
